@@ -6,6 +6,8 @@ from aiogram.types import Message, CallbackQuery
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from typing import Union
+
 from keyboards import *
 from variables import *
 from database import *
@@ -85,9 +87,12 @@ async def user_info(message: Message):
         select(UsersTable)
         .filter(UsersTable.user_id == user_id)
     )
-    user_class: UsersTable = user_inf.scalar()
-    class_text = str(user_class.class_num) + " " + user_class.class_letter
-    await message.answer("Вы сохранены в \"{}\" класс".format(class_text))
+    user_class: Union[UsersTable, None] = user_inf.scalar()
+    if user_class is not None:
+        class_text = str(user_class.class_num) + " " + user_class.class_letter
+        await message.answer("Вы сохранены в \"{}\" класс".format(class_text))
+    else:
+        await message.answer("Пройдите регестрацию для сохранения в класс")
 
 @dp.callback_query_handler(text_contains="class")
 async def choose_class_num(call: CallbackQuery):
@@ -113,6 +118,8 @@ async def choose_class_letter(call: CallbackQuery):
         inf_dict: dict = waiting_save[call.from_user.id]
         if "identify_class" in inf_dict:
             class_num = inf_dict["identify_class"]
+    else:
+        return
     del waiting_save[call.from_user.id]
     rs_class = class_num + " " + class_letter
 
