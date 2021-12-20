@@ -25,4 +25,6 @@ BOT_COMMANS_MESSAGE = (
     "/info <i>Показывает, в каком классе вы сохранены</i>\n"
 )
 
+all_letters = ["И"]
+
 WS_TYPE = Dict[int, Dict[str, Union[str, int]]]

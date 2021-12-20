@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Union
 
+from sqlalchemy.sql.expression import text
+
 from keyboards import *
 from variables import *
 from database import *
@@ -63,6 +65,8 @@ async def choose_class(message: Message):
     args = args_text.split(" ")
     if len(args) < 2:
         await message.answer(UNK_CLASS_MESSAGE)
+    elif args[1] not in all_letters:
+        await message.answer("Используйте только доступные буквы")
     elif (
         args[0].isdigit() \
             and not args[1].isdigit() \
@@ -76,7 +80,9 @@ async def choose_class(message: Message):
             message.from_user.id, class_letter, class_num
         )
 
-        await message.answer("Сохраняю вас в \"{}\" класс".format(args_text))
+        await message.answer(
+            "Сохраняю вас в \"{}\" класс".format(args_text)
+        )
     else:
         await message.answer(UNK_CLASS_MESSAGE)
 
