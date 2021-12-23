@@ -8,17 +8,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Union
 
-from sqlalchemy.sql.expression import text
-
 from keyboards import *
 from variables import *
 from database import *
 from models import *
+from router import Router
 
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
+
+router = Router()
 
 session = AsyncSession(engine)
 
@@ -44,6 +45,9 @@ async def save_to_class(user_id: int, class_letter: str, class_num: int):
         )
     await session.commit()
 
+@router.handle("test")
+async def test(message: Message):
+    await message.answer("in dev")
 
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: Message):
@@ -99,6 +103,10 @@ async def user_info(message: Message):
         await message.answer("Вы сохранены в \"{}\" класс".format(class_text))
     else:
         await message.answer("Пройдите регестрацию для сохранения в класс")
+
+@dp.message_handler()
+async def all_handler(message: Message):
+    await router.check(message)
 
 @dp.callback_query_handler(text_contains="class")
 async def choose_class_num(call: CallbackQuery):
