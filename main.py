@@ -8,10 +8,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Union
 
-from keyboards import *
-from variables import *
-from database import *
-from models import *
+from keyboards import (
+    start_keyboard,
+    letter_keyboard
+)
+from variables import (
+    API_TOKEN,
+    WS_TYPE,
+    WELCOME_MESSAGE,
+    BOT_COMMANS_MESSAGE,
+    UNK_CLASS_MESSAGE,
+    all_letters
+)
+from database import engine
+from models import UsersTable
 from router import Router
 
 logging.basicConfig(level=logging.INFO)
