@@ -6,6 +6,8 @@ dotenv.load_dotenv()
 
 API_TOKEN = os.getenv("TOKEN")
 DATABASE_URL = os.getenv("DB_URL")
+admins_text = os.getenv("ADMINS")
+ADMINS = [int(i) for i in admins_text.split(",")]
 
 WELCOME_MESSAGE = (
     "Для дальнейшего использования бота выберите класс,\n"

@@ -7,4 +7,5 @@ pip install -r requirements.txt
 ```
 TOKEN=[токен телеграм бота]
 DB_URL=sqlite+aiosqlite:///users.db
+ADMINS=[ID админов через запятую без пробелов ]
 ```

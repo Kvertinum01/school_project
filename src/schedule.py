@@ -82,7 +82,11 @@ async def onday_schedule(
         .filter(UsersTable.user_id == user_id)
     )
     user_inf: Optional[UsersTable] = user_inf.scalar()
+    if user_inf is None:
+        return "Пройдите регестрацию для сохранения в класс"
     class_name =  str(user_inf.class_num) + user_inf.class_letter.lower()
+    if class_name not in schedule_day:
+        return "Ваш класс не найден, пройдите регестрацию повторно, используя команду /start"
     class_schedule: dict = schedule_day[class_name]
     lessons_text = ""
     for lesson_num, lesson_str in class_schedule.items():

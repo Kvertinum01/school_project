@@ -17,6 +17,7 @@ from src.keyboards import (
 )
 from src.variables import (
     API_TOKEN,
+    ADMINS,
     WS_TYPE,
     WELCOME_MESSAGE,
     BOT_COMMANS_MESSAGE,
@@ -81,6 +82,24 @@ async def test(message: Message):
         weekday, message, schedule, session
     )
     await message.answer(today_schedule)
+
+@dp.message_handler(commands=["bug"])
+async def send_bug(message: Message):
+    args_text = message.get_args()
+    if len(args_text) < 1:
+        return await message.answer(
+            "Используйте команду правильно:\n/bug [найденная проблема]"
+        )
+    for admin in ADMINS:
+        await bot.send_message(
+            chat_id=admin,
+            text="Получен отчет об ошибке от пользователя с id {}:\n\"{}\".".format(
+                message.from_user.id, args_text
+            )
+        )
+    await message.answer(
+        "Мы получили отчёт об ошибке и постараемся исправить в близжайшее время"
+    )
 
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: Message):
