@@ -1,7 +1,11 @@
 import dotenv
 import os
+from pathlib import Path
 from typing import Dict, Union
 
+dir_path = Path(os.path.dirname(__file__))
+parent_path = dir_path.parent.absolute()
+dotenv_path = os.path.join(parent_path, ".env")
 dotenv.load_dotenv()
 
 API_TOKEN = os.getenv("TOKEN")

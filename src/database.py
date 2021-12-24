@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 import asyncio
 
-from variables import DATABASE_URL
-from models import Base
+from .variables import DATABASE_URL
+from .models import Base
 
 async def setup_databse():
     engine = create_async_engine(DATABASE_URL, echo=False, future=True)

@@ -8,11 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Union
 
-from keyboards import (
+from src.keyboards import (
     start_keyboard,
     letter_keyboard
 )
-from variables import (
+from src.variables import (
     API_TOKEN,
     WS_TYPE,
     WELCOME_MESSAGE,
@@ -20,9 +20,9 @@ from variables import (
     UNK_CLASS_MESSAGE,
     all_letters
 )
-from database import engine
-from models import UsersTable
-from router import Router
+from src.database import engine
+from src.models import UsersTable
+from src.router import Router
 
 logging.basicConfig(level=logging.INFO)
 
