@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from typing import Union
+from typing import Optional
 
 from src.keyboards import (
     start_keyboard,
@@ -107,7 +107,7 @@ async def user_info(message: Message):
         select(UsersTable)
         .filter(UsersTable.user_id == user_id)
     )
-    user_class: Union[UsersTable, None] = user_inf.scalar()
+    user_class: Optional[UsersTable] = user_inf.scalar()
     if user_class is not None:
         class_text = str(user_class.class_num) + " " + user_class.class_letter
         await message.answer("Вы сохранены в \"{}\" класс".format(class_text))
@@ -123,9 +123,11 @@ async def choose_class_num(call: CallbackQuery):
     await call.answer(cache_time=60)
     callback = call.data.split(":")
     class_num = callback[1]
+
     waiting_save.update(
         {call.from_user.id: {"identify_class": class_num}}
     )
+
     await call.message.answer(
         "Номер класса: {}\nТеперь выберите букву".format(class_num),
         reply_markup=letter_keyboard
@@ -138,12 +140,11 @@ async def choose_class_letter(call: CallbackQuery):
     callback = call.data.split(":")
     class_letter = callback[1]
 
-    if call.from_user.id in waiting_save:
-        inf_dict: dict = waiting_save[call.from_user.id]
-        if "identify_class" in inf_dict:
-            class_num = inf_dict["identify_class"]
+    inf_dict = waiting_save.get(call.from_user.id)
+    if inf_dict is not None:
+        class_num = inf_dict.get("identify_class")
     else:
-        return
+        return "Unknown callback"
     del waiting_save[call.from_user.id]
     rs_class = class_num + " " + class_letter
 
@@ -156,5 +157,4 @@ async def choose_class_letter(call: CallbackQuery):
     )
 
 if __name__ == '__main__':
-    logging.info("Starting bot")
     executor.start_polling(dp, skip_updates=True)

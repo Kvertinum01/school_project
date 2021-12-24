@@ -1,4 +1,4 @@
-from typing import Dict, Any, Callable
+from typing import Dict, Callable
 
 class Router:
     """
@@ -6,7 +6,7 @@ class Router:
     """
     
     def __init__(self):
-        self.routes: Dict[str, Any] = {}
+        self.routes: Dict[str, Callable] = {}
 
     def handle(self, text: str):
         def get_func(func: Callable):
