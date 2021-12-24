@@ -2,3 +2,4 @@ aiogram
 sqlalchemy
 aiosqlite
 python-dotenv
+openpyxl

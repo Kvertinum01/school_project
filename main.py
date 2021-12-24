@@ -8,9 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Optional
 
+from datetime import datetime, timedelta
+
 from src.keyboards import (
     start_keyboard,
-    letter_keyboard
+    letter_keyboard,
+    help_keyboard
 )
 from src.variables import (
     API_TOKEN,
@@ -19,6 +22,10 @@ from src.variables import (
     BOT_COMMANS_MESSAGE,
     UNK_CLASS_MESSAGE,
     all_letters
+)
+from src.schedule import (
+    get_full_schedule,
+    onday_schedule
 )
 from src.database import engine
 from src.models import UsersTable
@@ -31,6 +38,8 @@ dp = Dispatcher(bot)
 
 router = Router()
 
+schedule = get_full_schedule()
+
 session = AsyncSession(engine)
 
 waiting_save: WS_TYPE = {}
@@ -40,7 +49,7 @@ async def save_to_class(user_id: int, class_letter: str, class_num: int):
         select(UsersTable)
         .filter(UsersTable.user_id == user_id)
     )
-    user_inf: UsersTable = user_inf.scalar()
+    user_inf: Optional[UsersTable] = user_inf.scalar()
     user_class = UsersTable(user_id, class_letter, int(class_num))
     if user_inf is None:
         session.add(user_class)
@@ -55,9 +64,23 @@ async def save_to_class(user_id: int, class_letter: str, class_num: int):
         )
     await session.commit()
 
-@router.handle("test")
+@router.handle("расписание")
 async def test(message: Message):
-    await message.answer("in dev")
+    time = datetime.today()
+    weekday = time.weekday()
+    today_schedule = await onday_schedule(
+        weekday, message, schedule, session
+    )
+    await message.answer(today_schedule)
+
+@router.handle("расписание на завтра")
+async def test(message: Message):
+    time = datetime.today() + timedelta(days=1)
+    weekday = time.weekday()
+    today_schedule = await onday_schedule(
+        weekday, message, schedule, session
+    )
+    await message.answer(today_schedule)
 
 @dp.message_handler(commands=["start"])
 async def send_welcome(message: Message):
@@ -86,9 +109,9 @@ async def choose_class(message: Message):
             and not args[1].isdigit() \
                 and len(args[1]) == 1
     ):
-        args_text = args[0] + " " + args[1].upper()
         class_letter = args[1].upper()
         class_num = args[0]
+        args_text = class_num + " " + class_letter
 
         await save_to_class(
             message.from_user.id, class_letter, class_num
@@ -110,7 +133,10 @@ async def user_info(message: Message):
     user_class: Optional[UsersTable] = user_inf.scalar()
     if user_class is not None:
         class_text = str(user_class.class_num) + " " + user_class.class_letter
-        await message.answer("Вы сохранены в \"{}\" класс".format(class_text))
+        await message.answer(
+            "Вы сохранены в \"{}\" класс".format(class_text),
+            reply_markup=help_keyboard
+        )
     else:
         await message.answer("Пройдите регестрацию для сохранения в класс")
 
@@ -153,7 +179,8 @@ async def choose_class_letter(call: CallbackQuery):
     )
 
     await call.message.answer(
-        "Сохраняю вас в \"{}\" класс".format(rs_class)
+        "Сохраняю вас в \"{}\" класс".format(rs_class),
+        reply_markup=help_keyboard
     )
 
 if __name__ == '__main__':
