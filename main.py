@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Optional
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 from src.keyboards import (
     start_keyboard,
@@ -87,11 +87,12 @@ async def schedule_tomorrow(message: Message):
     )
     await message.answer(tomorrow_schedule)
 
+# ПРОВЕРИТЬ ЗАВТРА
 @router.handle("урок")
 async def now_lesson(message: Message):
     weekday = get_week_day()
     now_time = datetime.now()
-    int_time = (now_time.hour, now_time.second)
+    int_time = time(now_time.hour, now_time.second)
     lesson_now = await onclass_schedule(
         weekday, int_time, message, schedule, session
     )
@@ -101,8 +102,8 @@ async def now_lesson(message: Message):
 @router.handle("следующий урок")
 async def next_lesson(message: Message):
     weekday = get_week_day()
-    now_time = datetime.now() + timedelta(hours=1, minutes=1)
-    int_time = (now_time.hour, now_time.second)
+    now_time = datetime.now() + timedelta(minutes=46)
+    int_time = time(now_time.hour, now_time.second)
     lesson_now = await onclass_schedule(
         weekday, int_time, message, schedule, session
     )

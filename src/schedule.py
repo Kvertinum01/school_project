@@ -7,11 +7,13 @@ from sqlalchemy import select
 
 from typing import Optional
 
+from datetime import time
+
 from .models import UsersTable
 
 wb = load_workbook('./schedule.xlsx')
 
-lessons = [(8+i)+0.5 for i in range(9)]
+lessons = [(time(8+i, 30), time(8+i+1, 15)) for i in range(8)]
 
 clases = ["C", "E", "G", "I", "K", "M", "O", "Q"]
 days = ["понедельник", "вторник", "среда", "четверг", "пятница"]
@@ -111,35 +113,29 @@ async def onday_schedule(
         "Расписание на день недели {}:\n{}".format(strday, lessons_text)
     )
 
-def dict_index(wdict: dict, ind: int):
-    wlist = list(wdict.keys())
-    element = wlist[ind]
-    return wdict[element]
-
 async def onclass_schedule(
     day: int,
-    time: tuple,
+    curtime: time,
     message: Message,
     schedule: dict,
     session: AsyncSession
 ):
-    minutes = time[1]/60
-    if 15 < time[1] <= 29:
-        minutes = 0.5
-    curtime = time[0] + minutes
-    if curtime > lessons[-2]:
-        day += 1
-        time = (8, 30)
+    if curtime > lessons[-1][1]:
+        return "Уроки закончились"
     class_schedule = await schedule_dict(
         day, message, schedule, session
     )
     if not isinstance(class_schedule, dict):
         return class_schedule
+    class_schedule = list(class_schedule.values())
     now_lesson = 0
-    for ntime in lessons:
-        if ntime <= curtime+0.25 <= ntime+1:
-            now_lesson = int(ntime - 8.5)
+    for ind, ntime in enumerate(lessons):
+        if ntime[0] <= curtime <= ntime[1]:
+            now_lesson = ind
             break
-    str_lesson = dict_index(class_schedule, now_lesson)
+    str_lesson = class_schedule[now_lesson]
+    if 15 < curtime.minute < 30:
+        str_lesson = class_schedule[now_lesson+1]
+        return "Сейчас перемена, следующим будет\n{} урок - {}.".format(now_lesson+2, str_lesson)
     return "{} урок - {}.".format(now_lesson+1, str_lesson)
     
