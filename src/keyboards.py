@@ -23,14 +23,17 @@ letter_keyboard = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="И", callback_data="letter:И"),
             InlineKeyboardButton(text="Е", callback_data="letter:Е"),
-            InlineKeyboardButton(text="З", callback_data="letter:З"),
-            InlineKeyboardButton(text="Г", callback_data="letter:Г")
+            InlineKeyboardButton(text="З", callback_data="letter:З")
         ],
         [
+            InlineKeyboardButton(text="Г", callback_data="letter:Г"),
             InlineKeyboardButton(text="К", callback_data="letter:К"),
-            InlineKeyboardButton(text="С", callback_data="letter:С"),
+            InlineKeyboardButton(text="С", callback_data="letter:С")
+        ],
+        [
             InlineKeyboardButton(text="Т", callback_data="letter:Т"),
-            InlineKeyboardButton(text="Ж", callback_data="letter:Ж")
+            InlineKeyboardButton(text="Ж", callback_data="letter:Ж"),
+            InlineKeyboardButton(text="Д", callback_data="letter:Д")
         ]
     ]
 )
@@ -38,10 +41,12 @@ letter_keyboard = InlineKeyboardMarkup(
 help_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Расписание")
+            KeyboardButton(text="Расписание"),
+            KeyboardButton(text="Расписание на завтра")
         ],
         [
-            KeyboardButton(text="Расписание на завтра")
+            KeyboardButton(text="Урок"),
+            KeyboardButton(text="Следующий урок")
         ]
     ],
     resize_keyboard=True

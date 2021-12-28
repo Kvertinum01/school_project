@@ -26,7 +26,8 @@ from src.variables import (
 )
 from src.schedule import (
     get_full_schedule,
-    onday_schedule
+    onday_schedule,
+    onclass_schedule
 )
 from src.database import engine
 from src.models import UsersTable
@@ -65,23 +66,47 @@ async def save_to_class(user_id: int, class_letter: str, class_num: int):
         )
     await session.commit()
 
-@router.handle("расписание")
-async def test(message: Message):
-    time = datetime.today()
+def get_week_day(days: int = 0):
+    time = datetime.today() + timedelta(days=days)
     weekday = time.weekday()
+    return weekday
+
+@router.handle("расписание")
+async def schedule_today(message: Message):
+    weekday = get_week_day()
     today_schedule = await onday_schedule(
         weekday, message, schedule, session
     )
     await message.answer(today_schedule)
 
 @router.handle("расписание на завтра")
-async def test(message: Message):
-    time = datetime.today() + timedelta(days=1)
-    weekday = time.weekday()
-    today_schedule = await onday_schedule(
+async def schedule_tomorrow(message: Message):
+    weekday = get_week_day(days=1)
+    tomorrow_schedule = await onday_schedule(
         weekday, message, schedule, session
     )
-    await message.answer(today_schedule)
+    await message.answer(tomorrow_schedule)
+
+@router.handle("урок")
+async def now_lesson(message: Message):
+    weekday = get_week_day()
+    now_time = datetime.now()
+    int_time = (now_time.hour, now_time.second)
+    lesson_now = await onclass_schedule(
+        weekday, int_time, message, schedule, session
+    )
+    await message.answer(lesson_now)
+    
+
+@router.handle("следующий урок")
+async def next_lesson(message: Message):
+    weekday = get_week_day()
+    now_time = datetime.now() + timedelta(hours=1, minutes=1)
+    int_time = (now_time.hour, now_time.second)
+    lesson_now = await onclass_schedule(
+        weekday, int_time, message, schedule, session
+    )
+    await message.answer(lesson_now)
 
 @dp.message_handler(commands=["bug"])
 async def send_bug(message: Message):
