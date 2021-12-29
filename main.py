@@ -87,12 +87,11 @@ async def schedule_tomorrow(message: Message):
     )
     await message.answer(tomorrow_schedule)
 
-# ПРОВЕРИТЬ ЗАВТРА
 @router.handle("урок")
 async def now_lesson(message: Message):
     weekday = get_week_day()
     now_time = datetime.now()
-    int_time = time(now_time.hour, now_time.second)
+    int_time = time(now_time.hour, now_time.minute)
     lesson_now = await onclass_schedule(
         weekday, int_time, message, schedule, session
     )
@@ -103,7 +102,7 @@ async def now_lesson(message: Message):
 async def next_lesson(message: Message):
     weekday = get_week_day()
     now_time = datetime.now() + timedelta(minutes=46)
-    int_time = time(now_time.hour, now_time.second)
+    int_time = time(now_time.hour, now_time.minute)
     lesson_now = await onclass_schedule(
         weekday, int_time, message, schedule, session
     )

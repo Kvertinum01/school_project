@@ -19,7 +19,7 @@ clases = ["C", "E", "G", "I", "K", "M", "O", "Q"]
 days = ["понедельник", "вторник", "среда", "четверг", "пятница"]
 class_row = 9
 
-def get_schedule(day):
+def get_schedule(day: str):
     sheet = wb[day]
     classes_inf = {}
 
@@ -45,16 +45,16 @@ def get_schedule(day):
 
     schedule = {}
 
-    for class_fullletter in classes_inf:
-        now_dict = {class_fullletter: {}}
-        class_inf_now = classes_inf[class_fullletter]
+    for class_full_letter in classes_inf:
+        now_dict = {class_full_letter: {}}
+        class_inf_now = classes_inf[class_full_letter]
         letter = class_inf_now["letter"]
         for num in range(8):
             number = class_inf_now["number"] + (num+1)
             cell = sheet[letter+str(number)]
             if cell.value is None or cell.value == "-":
                 continue
-            now_dict[class_fullletter].update(
+            now_dict[class_full_letter].update(
                 {str(num+1): cell.value}
             )
         schedule.update(now_dict)
@@ -129,13 +129,13 @@ async def onclass_schedule(
         return class_schedule
     class_schedule = list(class_schedule.values())
     now_lesson = 0
-    for ind, ntime in enumerate(lessons):
+    for now_lesson, ntime in enumerate(lessons):
         if ntime[0] <= curtime <= ntime[1]:
-            now_lesson = ind
             break
     str_lesson = class_schedule[now_lesson]
     if 15 < curtime.minute < 30:
         str_lesson = class_schedule[now_lesson+1]
-        return "Сейчас перемена, следующим будет\n{} урок - {}.".format(now_lesson+2, str_lesson)
+        return "Сейчас перемена, следующим будет\n{} урок - {}." \
+            .format(now_lesson+2, str_lesson)
     return "{} урок - {}.".format(now_lesson+1, str_lesson)
     
